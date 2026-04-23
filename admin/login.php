@@ -1,3 +1,7 @@
+<?php 
+    session_start(); 
+    include('../config.php');
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,22 +11,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   </head>
   <body>
+    
     <?php
         $msg = "";
 
         if (!empty($_POST)) {
+
+            // kasutaja vormist
             $username = $_POST['user'];
             $password = $_POST['password'];
-            $hash = '$2y$10$6wBPfpAVsXZg/gwe9Y5U8uNmK3kGFjYb48m823zspnvA4JeEa.Gh6';
 
-            if ($username=="admin" && password_verify($password, $hash)) {
-                echo "tere admin";
-            }else{    
-                $msg = "vale kasutaja";
-            }
-            
+            // kasutaja andmebaasist
+            $paring = "SELECT user, password FROM users WHERE user='".$username."'";
+            $valjund = mysqli_query($yhendus, $paring);
+            $rida = mysqli_fetch_assoc($valjund);
+
+            if (!empty($rida)){
+                $hash = $rida['password'];
+                if ($username == $rida['user'] && password_verify($password, $hash)) {
+                    $_SESSION['tuvastamine'] = 'misiganes';
+                    header("Location: index.php");
+                }else{    
+                    $msg = "vale kasutaja";
+                }
+            }           
         }
     ?>
+
     <div class="container">
         <div class="row">
             <div class="col-sm-4"></div>
